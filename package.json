@@ -2,7 +2,7 @@
   "name": "gta-rampage",
   "version": "1.0.0",
   "description": "GTA Rampage game",
-  "main": "server/index.js",
+  "main": "lib/server.js",
   "scripts": {
     "start": "node .",
     "dev": "nodemon ."
