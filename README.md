@@ -1,2 +1,5 @@
-# gta-rampage
-Small game - GTA Rampage
+# GTA Rampage
+
+Small and simple game - GTA Rampage
+
+Uses NodeJS with Phaser
