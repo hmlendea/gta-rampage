@@ -6,8 +6,7 @@ var socket, land, player, enemies = [], speed = 0, prevPos;
 
 function preload() {
   game.load.image('earth', 'assets/light_sand.png')
-  game.load.spritesheet('dude', 'assets/dude.png', 64, 64)
-  game.load.spritesheet('enemy', 'assets/dude.png', 64, 64)
+  game.load.spritesheet('player', 'assets/player.png', 32, 32)
 }
 
 var worldSizeX = 1000;
@@ -31,10 +30,10 @@ function create() {
   prevPos = {x, y};
 
   // Setup the player
-  player = game.add.sprite(x, y, 'dude');
+  player = game.add.sprite(x, y, 'player');
   player.anchor.setTo(0.5, 0.5);
-  player.animations.add('move', [0, 1, 2, 3, 4, 5, 6, 7], 20, true);
-  player.animations.add('stop', [3], 20, true);
+  player.animations.add('move', [0, 1, 2, 3, 4], 10, true);
+  player.animations.add('stop', [0], 20, true);
 
   game.physics.enable(player, Phaser.Physics.ARCADE);
   player.body.maxVelocity.setTo(400, 400);
