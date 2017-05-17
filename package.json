@@ -1,0 +1,19 @@
+{
+  "name": "phaser-multiplayer-game",
+  "version": "1.0.0",
+  "description": "Phaser example gone multiplayer!",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node .",
+    "dev": "nodemon ."
+  },
+  "author": "Francisco Dias",
+  "license": "MIT",
+  "dependencies": {
+    "ecstatic": "^2.1.0",
+    "socket.io": "^1.7.3"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  }
+}
