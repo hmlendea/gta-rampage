@@ -1,14 +1,29 @@
 {
-  "name": "phaser-multiplayer-game",
+  "name": "gta-rampage",
   "version": "1.0.0",
-  "description": "Phaser example gone multiplayer!",
+  "description": "GTA Rampage game",
   "main": "server/index.js",
   "scripts": {
     "start": "node .",
     "dev": "nodemon ."
   },
-  "author": "Francisco Dias",
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HoratiuMl/gta-rampage.git"
+  },
+  "keywords": [ "gta", "rampage", "game" ],
+  "author": "Horatiu Mlendea <Mlendea.Horatiu@GMail.com>",
+  "authorName": "Horatiu Mlendea",
+  "linux": {
+    "genericName": "GTA Rampage",
+    "categories": "Game;",
+    "keywords": "GTA;Rampage;Game;"
+  },
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/HoratiuMl/gta-rampage"
+  },
+  "homepage": "https://github.com/HoratiuMl/gta-rampage#readme",
   "dependencies": {
     "ecstatic": "^2.1.0",
     "socket.io": "^1.7.3"
