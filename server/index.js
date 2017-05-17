@@ -29,10 +29,12 @@ const players = {};
 const onRemovePlayer = client => {
   log(`removing player: ${client.id}`);
   const removePlayer = players[client.id];
+
   if (!removePlayer) {
     log(`player not found: ${client.id}`);
     return;
   }
+
   delete players[client.id];
   io.emit('remove player', removePlayer);
 };
@@ -40,6 +42,7 @@ const onRemovePlayer = client => {
 const onNewPlayer = (ioClient, player) => {
   log(`new player: ${ioClient.id}`);
   const newPlayer = new Player(player.x, player.y, player.angle);
+
   newPlayer.id = ioClient.id
   io.emit('new player', newPlayer);
   Object.getOwnPropertyNames(players).forEach(id => ioClient.emit('new player', players[id]));
@@ -49,10 +52,12 @@ const onNewPlayer = (ioClient, player) => {
 function onMovePlayer(ioClient, player) {
   log(`moving player: ${ioClient.id}`);
   const movePlayer = players[ioClient.id];
+
   if (!movePlayer) {
     log(`player not found: ${ioClient.id}`);
     return;
   }
+  
   Object.assign(movePlayer, player);
   io.emit('move player', movePlayer);
 }

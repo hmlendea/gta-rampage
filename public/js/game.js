@@ -10,29 +10,43 @@ function preload() {
   game.load.spritesheet('enemy', 'assets/dude.png', 64, 64)
 }
 
+var worldSizeX = 1000;
+var worldSizeY = 1000;
+
+var canvasSizeX = 800;
+var canvasSizeY = 600;
+
 function create() {
   log('create game');
-  game.world.setBounds(-500, -500, 1000, 1000); //game world 2000 x 2000
-  // create land
-  land = game.add.tileSprite(0, 0, 800, 600, 'earth');
+  game.world.setBounds(-worldSizeX / 2, -worldSizeY / 2, worldSizeX, worldSizeY);
+
+  // Create the land
+  land = game.add.tileSprite(0, 0, canvasSizeX, canvasSizeY, 'earth');
   land.fixedToCamera = true;
+
   // create player
-  var x = Math.round(Math.random() * (1000) - 500);
-  var y = Math.round(Math.random() * (1000) - 500);
+  var x = Math.round(Math.random() * (worldSizeX) - worldSizeX / 2);
+  var y = Math.round(Math.random() * (worldSizeY) - worldSizeY / 2);
+
   prevPos = {x, y};
+
+  // Setup the player
   player = game.add.sprite(x, y, 'dude');
   player.anchor.setTo(0.5, 0.5);
   player.animations.add('move', [0, 1, 2, 3, 4, 5, 6, 7], 20, true);
   player.animations.add('stop', [3], 20, true);
+
   game.physics.enable(player, Phaser.Physics.ARCADE);
   player.body.maxVelocity.setTo(400, 400);
   player.body.collideWorldBounds = true;
   player.bringToTop();
-  // prepare camera
+
+  // Setup the camera
   game.camera.follow(player);
   game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300);
   game.camera.focusOnXY(0, 0);
-  // set event handlers
+
+  // Setup the event handlers
   socket = io.connect();
   socket.on('connect', onSocketConnected);
   socket.on('disconnect', onSocketDisconnect);
@@ -55,20 +69,24 @@ function onSocketDisconnect() {
 function onNewPlayer(data) {
   log(`new player connected: ${data.id}`);
   var duplicate = playerById(data.id);
+  
   if (duplicate) {
     log('duplicate player!');
     return;
   }
+
   enemies.push(new RemotePlayer(data.id, game, player, data.x, data.y, data.angle));
 }
 
 function onMovePlayer(data) {
   log(`move player: ${data.id}`);
   var movePlayer = playerById(data.id);
+
   if (!movePlayer) {
     log(`player not found: ${data.id}`);
     return;
   }
+
   movePlayer.player.x = data.x;
   movePlayer.player.y = data.y;
   movePlayer.player.angle = data.angle;
@@ -77,10 +95,12 @@ function onMovePlayer(data) {
 function onRemovePlayer(data) {
   log(`remove player: ${data.id}`);
   var removePlayer = playerById(data.id);
+
   if (!removePlayer) {
     log(`player not found: ${data.id}`);
     return;
   }
+
   removePlayer.player.kill()
   enemies.splice(enemies.indexOf(removePlayer), 1)
 }
@@ -88,23 +108,27 @@ function onRemovePlayer(data) {
 function update() {
   for (var i = 0; i < enemies.length; i++) {
     if (enemies[i].alive) {
-      enemies[i].update()
-      game.physics.arcade.collide(player, enemies[i].player)
+      enemies[i].update();
+      game.physics.arcade.collide(player, enemies[i].player);
     }
   }
+
   if (speed > 0) {
-    speed -= 4
+    speed -= 4;
   }
-  game.physics.arcade.velocityFromRotation(player.rotation, speed, player.body.velocity)
+
+  game.physics.arcade.velocityFromRotation(player.rotation, speed, player.body.velocity);
   player.animations.play(speed > 0 ? 'move' : 'stop');
-  land.tilePosition.x = -game.camera.x
-  land.tilePosition.y = -game.camera.y
+  land.tilePosition.x = -game.camera.x;
+  land.tilePosition.y = -game.camera.y;
+
   if (game.input.activePointer.isDown) {
     if (game.physics.arcade.distanceToPointer(player) >= 10) {
-      speed = 300
-      player.rotation = game.physics.arcade.angleToPointer(player)
+      speed = 300;
+      player.rotation = game.physics.arcade.angleToPointer(player);
     }
   }
+
   if (player.x != prevPos.x || player.y != prevPos.y) {
     socket.emit('move player', {x: player.x, y: player.y, angle: player.angle});
     prevPos = {x: player.x, y: player.y};
@@ -114,8 +138,9 @@ function update() {
 function playerById(id) {
   for (var i = 0; i < enemies.length; i++) {
     if (enemies[i].player.name === id) {
-      return enemies[i]
+      return enemies[i];
     }
   }
-  return false
+  
+  return false;
 }
