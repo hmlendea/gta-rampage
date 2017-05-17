@@ -2,7 +2,7 @@ let log = console.log;
 
 var game = new Phaser.Game(800, 600, Phaser.AUTO, '', {preload, create, update,});
 
-var socket, land, player, enemies = [], speed = 0, prevPos;
+var socket, land, player, players = [], speed = 0, prevPos;
 
 function preload() {
   game.load.image('earth', 'assets/light_sand.png')
@@ -56,8 +56,8 @@ function create() {
 
 function onSocketConnected() {
   log('connected to server');
-  enemies.forEach(enemy => enemy.player.kill());
-  enemies = [];
+  players.forEach(player => player.player.kill());
+  players = [];
   socket.emit('new player', {x: player.x, y: player.y, angle: player.angle});
 }
 
@@ -73,8 +73,8 @@ function onNewPlayer(data) {
     log('duplicate player!');
     return;
   }
-
-  enemies.push(new RemotePlayer(data.id, game, player, data.x, data.y, data.angle));
+  
+  players.push(new RemotePlayer(data.id, game, player, data.x, data.y, data.angle));
 }
 
 function onMovePlayer(data) {
@@ -101,14 +101,14 @@ function onRemovePlayer(data) {
   }
 
   removePlayer.player.kill()
-  enemies.splice(enemies.indexOf(removePlayer), 1)
+  players.splice(players.indexOf(removePlayer), 1)
 }
 
 function update() {
-  for (var i = 0; i < enemies.length; i++) {
-    if (enemies[i].alive) {
-      enemies[i].update();
-      game.physics.arcade.collide(player, enemies[i].player);
+  for (var i = 0; i < players.length; i++) {
+    if (players[i].alive) {
+      players[i].update();
+      game.physics.arcade.collide(player, players[i].player);
     }
   }
 
@@ -135,9 +135,9 @@ function update() {
 }
 
 function playerById(id) {
-  for (var i = 0; i < enemies.length; i++) {
-    if (enemies[i].player.name === id) {
-      return enemies[i];
+  for (var i = 0; i < players.length; i++) {
+    if (players[i].player.name === id) {
+      return players[i];
     }
   }
   
