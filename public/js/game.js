@@ -33,7 +33,7 @@ function create() {
   player = game.add.sprite(x, y, 'player');
   player.anchor.setTo(0.5, 0.5);
   player.animations.add('move', [0, 1, 2, 3, 4], 10, true);
-  player.animations.add('stop', [0], 20, true);
+  player.animations.add('stop', [4, 5], 2, true);
 
   game.physics.enable(player, Phaser.Physics.ARCADE);
   player.body.maxVelocity.setTo(400, 400);
