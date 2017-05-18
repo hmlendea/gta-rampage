@@ -7,6 +7,7 @@ var socket, land, player, players = [], speed = 0, prevPos;
 function preload() {
   game.load.image('earth', 'assets/city1.png')
   game.load.spritesheet('player', 'assets/player.png', 32, 32)
+  game.load.spritesheet('player_other', 'assets/player_other.png', 32, 32)
 }
 
 var worldSizeX = 1000;
