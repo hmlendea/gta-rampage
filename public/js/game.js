@@ -5,7 +5,7 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, '', {preload, create, update,}
 var socket, land, player, players = [], speed = 0, prevPos;
 
 function preload() {
-  game.load.image('earth', 'assets/light_sand.png')
+  game.load.image('earth', 'assets/city1.png')
   game.load.spritesheet('player', 'assets/player.png', 32, 32)
 }
 
