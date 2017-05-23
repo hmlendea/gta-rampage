@@ -1,6 +1,6 @@
 /* global game */
 
-var RemotePlayer = function (index, game, human, startX, startY, startAngle) {
+var Pedestrian = function (index, game, human, startX, startY, startAngle) {
   var x = startX;
   var y = startY;
   var angle = startAngle;
@@ -9,7 +9,7 @@ var RemotePlayer = function (index, game, human, startX, startY, startAngle) {
   this.human = human;
   this.alive = true;
 
-  this.human = game.add.sprite(x, y, 'player_other');
+  this.human = game.add.sprite(x, y, 'pedestrian');
 
   this.human.animations.add('move', [0, 1, 2, 3, 4, 5, 6, 7], 20, true);
   this.human.animations.add('stop', [3], 20, true);
@@ -26,7 +26,7 @@ var RemotePlayer = function (index, game, human, startX, startY, startAngle) {
   this.lastPosition = { x: x, y: y, angle: angle };
 }
 
-RemotePlayer.prototype.update = function () {
+Pedestrian.prototype.update = function () {
   if (this.human.x !== this.lastPosition.x ||
       this.human.y !== this.lastPosition.y ||
       this.human.angle != this.lastPosition.angle) {
@@ -44,4 +44,4 @@ RemotePlayer.prototype.update = function () {
   this.lastPosition.angle = this.human.angle;
 }
 
-window.RemotePlayer = RemotePlayer;
+window.Pedestrian = Pedestrian;
