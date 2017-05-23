@@ -2,12 +2,16 @@ let log = console.log;
 
 var game = new Phaser.Game(800, 600, Phaser.AUTO, '', {preload, create, update,});
 
-var socket, land, player, players = [], speed = 0, prevPos;
+var socket, land, speed = 0, prevPos;
+
+var player, players = [];
+var pedestrians = [];
 
 function preload() {
-  game.load.image('earth', 'assets/city1.png')
-  game.load.spritesheet('player', 'assets/player.png', 32, 32)
-  game.load.spritesheet('player_other', 'assets/player_other.png', 32, 32)
+  game.load.image('earth', 'assets/city1.png');
+  game.load.spritesheet('player', 'assets/player.png', 32, 32);
+  game.load.spritesheet('player_other', 'assets/player_other.png', 32, 32);
+  game.load.spritesheet('pedestrian', 'assets/pedestrian.png', 32, 32);
 }
 
 var worldSizeX = 1000;
@@ -51,13 +55,16 @@ function create() {
   socket.on('connect', onSocketConnected);
   socket.on('disconnect', onSocketDisconnect);
   socket.on('new player', onNewPlayer);
+  socket.on('new pedestrian', onNewPedestrian);
   socket.on('move player', onMovePlayer);
+  socket.on('move pedestrian', onMovePedestrian);
   socket.on('remove player', onRemovePlayer);
+  socket.on('remove pedestrian', onRemovePedestrian);
 }
 
 function onSocketConnected() {
   log('connected to server');
-  players.forEach(player => player.player.kill());
+  players.forEach(player => player.human.kill());
   players = [];
   socket.emit('new player', {x: player.x, y: player.y, angle: player.angle});
 }
@@ -78,6 +85,18 @@ function onNewPlayer(data) {
   players.push(new RemotePlayer(data.id, game, player, data.x, data.y, data.angle));
 }
 
+function onNewPedestrian(data) {
+  log(`new pedestrian spawned: ${data.id}`);
+  var duplicate = pedestrianById(data.id);
+  
+  if (duplicate) {
+    log('duplicate pedestrian!');
+    return;
+  }
+  
+  pedestrians.push(new Pedestrian(data.id, game, player, data.x, data.y, data.angle));
+}
+
 function onMovePlayer(data) {
   log(`move player: ${data.id}`);
   var movePlayer = playerById(data.id);
@@ -87,9 +106,23 @@ function onMovePlayer(data) {
     return;
   }
 
-  movePlayer.player.x = data.x;
-  movePlayer.player.y = data.y;
-  movePlayer.player.angle = data.angle;
+  movePlayer.human.x = data.x;
+  movePlayer.human.y = data.y;
+  movePlayer.human.angle = data.angle;
+}
+
+function onMovePedestrian(data) {
+  log(`move pedestrian: ${data.id}`);
+  var movePedestrian = pedestrianById(data.id);
+
+  if (!movePedestrian) {
+    log(`pedestrian not found: ${data.id}`);
+    return;
+  }
+
+  movePedestrian.human.x = data.x;
+  movePedestrian.human.y = data.y;
+  movePedestrian.human.angle = data.angle;
 }
 
 function onRemovePlayer(data) {
@@ -101,15 +134,35 @@ function onRemovePlayer(data) {
     return;
   }
 
-  removePlayer.player.kill()
+  removePlayer.human.kill()
   players.splice(players.indexOf(removePlayer), 1)
+}
+
+function onRemovePedestrian(data) {
+  log(`remove pedestrian: ${data.id}`);
+  var removePedestrian = pedestrianById(data.id);
+
+  if (!removePedestrian) {
+    log(`pedestrian not found: ${data.id}`);
+    return;
+  }
+
+  removePedestrian.human.kill()
+  pedestrians.splice(pedestrians.indexOf(removePedestrian), 1)
 }
 
 function update() {
   for (var i = 0; i < players.length; i++) {
     if (players[i].alive) {
       players[i].update();
-      game.physics.arcade.collide(player, players[i].player);
+      game.physics.arcade.collide(player, players[i].human);
+    }
+  }
+
+  for (var i = 0; i < pedestrians.length; i++) {
+    if (pedestrians[i].alive) {
+      pedestrians[i].update();
+      game.physics.arcade.collide(player, pedestrians[i].human);
     }
   }
 
@@ -137,8 +190,18 @@ function update() {
 
 function playerById(id) {
   for (var i = 0; i < players.length; i++) {
-    if (players[i].player.name === id) {
+    if (players[i].human.name === id) {
       return players[i];
+    }
+  }
+  
+  return false;
+}
+
+function pedestrianById(id) {
+  for (var i = 0; i < pedestrians.length; i++) {
+    if (pedestrians[i].human.name === id) {
+      return pedestrians[i];
     }
   }
   
